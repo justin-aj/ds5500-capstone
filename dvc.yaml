@@ -1,0 +1,42 @@
+stages:
+  data_ingestion:
+    cmd: python src/synth/data_ingestion.py
+    deps:
+      - src/synth/data_ingestion.py
+      - src/synth/config.py
+      - data/synth_flight_paths_spring_2026_v1_40_cm_per_sec.parquet
+    params:
+      - configs/synth.yaml:
+          - paths
+          - zone_of_port
+    outs:
+      - data/interim/reads.parquet
+
+  data_labeling:
+    cmd: python src/synth/data_labeling.py
+    deps:
+      - src/synth/data_labeling.py
+      - src/synth/config.py
+      - data/interim/reads.parquet
+    params:
+      - configs/synth.yaml:
+          - zones
+    outs:
+      - data/interim/flights.parquet
+
+  feature_engineering:
+    cmd: python src/synth/feature_engineering.py
+    deps:
+      - src/synth/feature_engineering.py
+      - src/synth/config.py
+      - data/interim/reads.parquet
+      - data/interim/flights.parquet
+    params:
+      - configs/synth.yaml:
+          - zones
+          - tag_strength
+          - rssi_floor_dbm
+          - rssi_quantiles
+    outs:
+      - data/processed/features.parquet
+

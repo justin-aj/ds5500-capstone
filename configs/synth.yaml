@@ -1,0 +1,43 @@
+paths:
+  raw: data/synth_flight_paths_spring_2026_v1_40_cm_per_sec.parquet
+  reads: data/interim/reads.parquet
+  flights: data/interim/flights.parquet
+  features: data/processed/features.parquet
+  selected_features: data/processed/selected_features.parquet
+  model_features: data/processed/model_features.parquet
+  v8_008: data/v8_mini_008.parquet
+  features_008: data/processed/features_008.parquet
+  v8_003: data/v8_mini_003.parquet
+  features_003: data/processed/features_003.parquet
+
+# Antenna port -> zone. Zones are inputs describing where an antenna sits, not gates.
+zone_of_port:
+  13: outside
+  15: outside
+  9: middle
+  10: middle
+  11: middle
+  12: middle
+  14: inside
+  16: inside
+zones: [outside, middle, inside]
+
+# Antenna position along the belt in cm from the tunnel center (negative is the entrance side).
+position_cm:
+  13: -40
+  15: -40
+  9: 0
+  10: 0
+  11: 0
+  12: 0
+  14: 40
+  16: 40
+
+# Feature engineering. Tag strength is ordered by signal strength. A zone that never heard the
+# flight counts as `rssi_floor_dbm`. `rssi_quantiles` are the low and high quantiles of p90_p10.
+tag_strength:
+  dim: 0
+  medium: 1
+  bright: 2
+rssi_floor_dbm: -85
+rssi_quantiles: [0.1, 0.9]

@@ -1,0 +1,103 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python src/synth/data_ingestion.py
+    deps:
+    - path: data/synth_flight_paths_spring_2026_v1_40_cm_per_sec.parquet
+      hash: md5
+      md5: 903661aa5f79621ae96344185c341f98
+      size: 72890596
+      isexec: true
+    - path: src/synth/config.py
+      hash: md5
+      md5: 1f10f25ecb7e1a025fa98ffa99bae348
+      size: 844
+    - path: src/synth/data_ingestion.py
+      hash: md5
+      md5: 2a8475146745c0ccec33addf0ed4ddfb
+      size: 1183
+    params:
+      configs/synth.yaml:
+        paths:
+          raw: data/synth_flight_paths_spring_2026_v1_40_cm_per_sec.parquet
+          reads: data/interim/reads.parquet
+          flights: data/interim/flights.parquet
+          features: data/processed/features.parquet
+        zone_of_port:
+          13: outside
+          15: outside
+          9: middle
+          10: middle
+          11: middle
+          12: middle
+          14: inside
+          16: inside
+    outs:
+    - path: data/interim/reads.parquet
+      hash: md5
+      md5: 12e88e63031cbbab3105276022dee395
+      size: 41806053
+  data_labeling:
+    cmd: python src/synth/data_labeling.py
+    deps:
+    - path: data/interim/reads.parquet
+      hash: md5
+      md5: 12e88e63031cbbab3105276022dee395
+      size: 41806053
+    - path: src/synth/config.py
+      hash: md5
+      md5: 1f10f25ecb7e1a025fa98ffa99bae348
+      size: 844
+    - path: src/synth/data_labeling.py
+      hash: md5
+      md5: aa8a7f486626b01cf5a8b4b1660eb418
+      size: 4743
+    params:
+      configs/synth.yaml:
+        zones:
+        - outside
+        - middle
+        - inside
+    outs:
+    - path: data/interim/flights.parquet
+      hash: md5
+      md5: 56bd00ac39b6d5928f53adc54f91c626
+      size: 424581
+  feature_engineering:
+    cmd: python src/synth/feature_engineering.py
+    deps:
+    - path: data/interim/flights.parquet
+      hash: md5
+      md5: 56bd00ac39b6d5928f53adc54f91c626
+      size: 424581
+    - path: data/interim/reads.parquet
+      hash: md5
+      md5: 12e88e63031cbbab3105276022dee395
+      size: 41806053
+    - path: src/synth/config.py
+      hash: md5
+      md5: 1f10f25ecb7e1a025fa98ffa99bae348
+      size: 844
+    - path: src/synth/feature_engineering.py
+      hash: md5
+      md5: dcac8151f9514b0bb2cb182fc353f7aa
+      size: 3016
+    params:
+      configs/synth.yaml:
+        rssi_floor_dbm: -85
+        rssi_quantiles:
+        - 0.1
+        - 0.9
+        tag_strength:
+          dim: 0
+          medium: 1
+          bright: 2
+        zones:
+        - outside
+        - middle
+        - inside
+    outs:
+    - path: data/processed/features.parquet
+      hash: md5
+      md5: 63c1a55bd41ecd48195d11f06f9e88a0
+      size: 1289904
